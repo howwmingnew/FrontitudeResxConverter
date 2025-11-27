@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FrontitudeToResxXlsx": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\SynologyDrive\\home\\Work\\JsonToSlsxConv\\Frontitude_export.json\" \"output.xlsx\""
+    }
+  }
+}
