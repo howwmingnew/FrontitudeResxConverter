@@ -25,12 +25,17 @@ jobs:
         run: dotnet build ./FrontitudeToResxXlsx/FrontitudeToResxXlsx.csproj -c Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./FrontitudeToResxXlsx/FrontitudeToResxXlsx.csproj -c Release -o out --no-build
+        run: dotnet publish ./FrontitudeToResxXlsx/FrontitudeToResxXlsx.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -o out
+
+      - name: Create zip package
+        run: |
+          powershell -Command "Compress-Archive -Path out/* -DestinationPath FrontitudeResxXlsx_win-x64.zip -Force"
 
       - name: Create GitHub Release and upload artifacts
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            out/**/*
+            out/FrontitudeToResxXlsx.exe
+            FrontitudeResxXlsx_win-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
