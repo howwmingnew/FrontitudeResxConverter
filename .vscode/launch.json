@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Launch (FrontitudeToResxXlsx)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "prepareOutputFolder",
+      "program": "${workspaceFolder}/FrontitudeToResxXlsx/bin/Debug/net8.0/FrontitudeToResxXlsx.dll",
+      "args": [
+        "TestData/Frontitude_export.json",
+        "Output/output.xlsx"
+      ],
+      "cwd": "${workspaceFolder}/FrontitudeToResxXlsx",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}

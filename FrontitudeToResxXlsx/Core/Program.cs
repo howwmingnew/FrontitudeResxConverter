@@ -4,11 +4,11 @@ using System.IO;
 using System.Text.Json;
 using ClosedXML.Excel;
 
-// 簡單的小工具：
-// Frontitude Json -> ResX Manager 可匯入的 xlsx
-// 使用方式：
+// Simple utility:
+// Convert Frontitude JSON -> ResX Manager compatible .xlsx
+// Usage:
 //   FrontitudeToResxXlsx.exe <inputJsonPath> <outputXlsxPath>
-// 例如：
+// Example:
 //   FrontitudeToResxXlsx.exe Frontitude_export.json output.xlsx
 
 namespace FrontitudeToResxXlsx
@@ -17,18 +17,41 @@ namespace FrontitudeToResxXlsx
     {
         static int Main(string[] args)
         {
-            if (args.Length < 2)
+            // If no arguments are provided → wait for user input
+            if (args.Length < 1)
             {
-                Console.WriteLine("Usage: FrontitudeToResxXlsx <inputJsonPath> <outputXlsxPath>");
-                return 1;
+                Console.WriteLine("No arguments provided.");
+                Console.Write("Please enter JSON input file path: ");
+                var userInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(userInput))
+                {
+                    Console.WriteLine("No input provided.");
+                    return 1;
+                }
+
+                args = new string[] { userInput };
             }
 
             var inputJsonPath = args[0];
-            var outputXlsxPath = args[1];
+            string outputXlsxPath;
+
+            // Use second argument if provided
+            if (args.Length >= 2)
+            {
+                outputXlsxPath = args[1];
+            }
+            else
+            {
+                // Auto-generate filename based on today's date
+                var today = DateTime.Now.ToString("yyyyMMdd");
+                outputXlsxPath = $"{today}.xlsx";
+                Console.WriteLine($"Output path not provided. Auto-generated: {outputXlsxPath}");
+            }
 
             if (!File.Exists(inputJsonPath))
             {
-                Console.WriteLine($"Json file not found: {inputJsonPath}");
+                Console.WriteLine($"JSON file not found: {inputJsonPath}");
                 return 1;
             }
 
@@ -36,7 +59,7 @@ namespace FrontitudeToResxXlsx
             {
                 var jsonText = File.ReadAllText(inputJsonPath);
 
-                // 結構：Dictionary<語系, Dictionary<key, value>>
+                // Data structure: Dictionary<Language, Dictionary<Key, Value>>
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -45,30 +68,30 @@ namespace FrontitudeToResxXlsx
                 var data = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(jsonText, options);
                 if (data == null)
                 {
-                    Console.WriteLine("Json 內容解析失敗。");
+                    Console.WriteLine("Failed to parse JSON content.");
                     return 1;
                 }
 
                 if (!data.ContainsKey("en_US"))
                 {
-                    Console.WriteLine("Json 中找不到 en_US 節點，無法決定主 key 列表。");
+                    Console.WriteLine("JSON does not contain 'en_US' node. Cannot determine base key list.");
                     return 1;
                 }
 
                 var enDict = data["en_US"];
                 var keys = new List<string>(enDict.Keys);
 
-                // 建立新的 xlsx
+                // Create new xlsx
                 using var wb = new XLWorkbook();
                 var ws = wb.Worksheets.Add("ResXResourceManager");
 
-                // --- Header Row (根據你提供的 sample 照抄) ---
+                // --- Header Row (copied according to sample file) ---
                 int row = 1;
                 ws.Cell(row, 1).Value = "Project";
                 ws.Cell(row, 2).Value = "File";
                 ws.Cell(row, 3).Value = "Key";
                 ws.Cell(row, 4).Value = "Comment";
-                ws.Cell(row, 5).Value = string.Empty;      // 主語系 (en_US)
+                ws.Cell(row, 5).Value = string.Empty; // Main language (en_US)
 
                 ws.Cell(row, 6).Value = "Comment.ar";
                 ws.Cell(row, 7).Value = ".ar";
@@ -99,7 +122,7 @@ namespace FrontitudeToResxXlsx
                 ws.Cell(row, 32).Value = "Comment.zh-TW";
                 ws.Cell(row, 33).Value = ".zh-TW";
 
-                // 建立 Json 語系 -> 欄位的對應表
+                // JSON language → column mapping
                 var langToCol = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["en_US"] = 5,
@@ -107,7 +130,13 @@ namespace FrontitudeToResxXlsx
                     ["fr"] = 9,
                     ["ja"] = 11,
                     ["kk"] = 13,
+
+                    // Korean may appear as "ko", "ko-KR", or "ko_KR"
+                    // Treat all as the same language column (.ko)
                     ["ko"] = 15,
+                    ["ko-KR"] = 15,
+                    ["ko_KR"] = 15,
+
                     ["pl"] = 17,
                     ["pt"] = 19,
                     ["ro"] = 21,
@@ -119,20 +148,20 @@ namespace FrontitudeToResxXlsx
                     ["zh_TW"] = 33,
                 };
 
-                // --- 寫入每一列資源 ---
+                // --- Write each resource row ---
                 row = 2;
                 foreach (var key in keys)
                 {
-                    ws.Cell(row, 1).Value = "UI";                   // 依照 sample，Project 固定填 UI
-                    ws.Cell(row, 2).Value = "Properties\\Resources"; // 依照 sample
+                    ws.Cell(row, 1).Value = "UI"; // Based on sample
+                    ws.Cell(row, 2).Value = "Properties\\Resources"; // Based on sample
                     ws.Cell(row, 3).Value = key;
-                    ws.Cell(row, 4).Value = string.Empty;             // Comment 先留空
+                    ws.Cell(row, 4).Value = string.Empty; // Comment left empty
 
                     foreach (var (lang, dict) in data)
                     {
                         if (!langToCol.TryGetValue(lang, out var col))
                         {
-                            // 有不在 mapping 中的語系就略過
+                            // Ignore languages not in mapping
                             continue;
                         }
 
@@ -145,17 +174,17 @@ namespace FrontitudeToResxXlsx
                     row++;
                 }
 
-                // 簡單調整欄寬好看一點
+                // Auto-adjust column width
                 ws.Columns().AdjustToContents();
 
-                // 輸出檔案
+                // Save output file
                 wb.SaveAs(outputXlsxPath);
                 Console.WriteLine($"Done. Output: {outputXlsxPath}");
                 return 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("發生錯誤：" + ex.Message);
+                Console.WriteLine(ex.Message);
                 return 1;
             }
         }

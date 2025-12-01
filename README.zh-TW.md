@@ -7,49 +7,35 @@
 
 # FrontitudeResxConverter
 
-一個將 **Frontitude** 匯出的多語系 JSON，轉換為 **ResX Manager** 可匯入的 Excel `.xlsx` 檔的小工具。
+FrontitudeResxConverter 是一個將 **Frontitude 匯出的多語系 JSON**
+轉換成 **ResX Manager（Visual Studio 擴充套件）可匯入的 Excel `.xlsx`** 的小工具。
 
-## 功能簡介
+此工具主要用於 .NET / WPF 專案的多國語系流程整合，
+協助開發者快速將 Frontitude 的文案資料導入 ResX 管理流程中。
 
-本工具適用於使用 WPF / .NET 的專案，情境大致如下：
+---
 
-- 使用 **Frontitude** 管理 UI 文案與多國語系內容。
-- 在 Visual Studio 中使用 **ResX Manager** 管理 `.resx` 資源檔。
-- 需要在兩者之間建立橋樑：  
-  把 Frontitude 的 JSON 匯出 → 轉成 ResX Manager 可讀的 Excel 匯入格式。
+## 📌 功能特色
 
-工具會：
+- 將 Frontitude JSON 轉換為 ResX Manager Excel 格式
+- 自動建立翻譯欄位、調整欄寬
+- 自動處理語系名稱：
+  - `ko` / `ko-KR` / `ko_KR` → 全部視為韓文 `.ko`
+- 若未提供輸出檔名 → 自動使用「yyyyMMdd.xlsx」
+- 若完全沒有輸入參數 → 互動模式請使用者輸入 JSON 路徑
+- 支援在 Windows 檔案總管 **拖曳 JSON 檔到 exe 執行**
 
-- 讀取 Frontitude 匯出的 JSON（語系 → key → value 的結構）。
-- 產生符合 ResX Manager 匯入格式的 Excel：
-  - 一列代表一個資源 key（例如 `about_0`）。
-  - 一欄代表一種語言（例如 `en_US`、`ar`、`fr`、`zh-CN`、`zh-TW`…）。
-  - 包含 `Project`、`File`、`Key`、`Comment` 等欄位，欄位順序可依既有範例調整。
+---
 
-## 前置需求
+## 📂 JSON 格式（Frontitude 匯出）
 
-- .NET SDK（建議 .NET 6 或 .NET 8）。
-- Windows 環境（目前 GitHub Actions workflow 使用 `windows-latest`）。
-- NuGet 套件：[`ClosedXML`](https://www.nuget.org/packages/ClosedXML) 用來輸出 `.xlsx`。
-
-## JSON 格式說明（Frontitude 匯出）
-
-預期的 JSON 結構如下：
-
-```jsonc
+```json
 {
   "en_US": {
-    "about_0": "All right reserved.",
+    "about_0": "All rights reserved.",
     "about_1": "Terms of use"
   },
-  "ar": {
-    "about_0": "...",
-    "about_1": "..."
-  },
-  "fr": {
-    "about_0": "..."
-  },
-  "zh_CN": {
+  "ko-KR": {
     "about_0": "..."
   },
   "zh_TW": {
@@ -58,92 +44,76 @@
 }
 ```
 
-- 第一層 key：語系代碼（例如 `en_US`、`ar`、`fr`、`zh_CN`、`zh_TW`）。
-- 第二層 key：資源 key（例如 `about_0`），value 為對應語系的翻譯文字。
+---
 
-## 輸出 Excel 格式（ResX Manager）
+## 📊 Excel 產出格式（符合 ResX Manager）
 
-程式會建立名為 `ResXResourceManager` 的工作表，欄位設計與 ResX Manager 的 Excel 匯入相容。
+產生工作表名稱：`ResXResourceManager`
 
-常見欄位：
+主要欄位：
 
 - `Project`
 - `File`
 - `Key`
 - `Comment`
-- 主語系欄位（例如 `en_US`）
-- 各語系欄位：`.ar`、`.fr`、`.ja`、`.kk`、`.ko`、`.pl`、`.pt`、`.ro`、`.ru`、`.th`、`.tr`、`.vi`、`.zh-CN`、`.zh-TW`……
+- 主語系 (en_US)
+- `.ar`、`.fr`、`.ja`、`.ko`、`.pl`、`.ru`
+- `.zh-CN`、`.zh-TW`
+- ……等常見語系欄位
 
-實際欄位名稱與順序可依你現有的 ResX Manager 範例檔調整。
+---
 
-## 使用方式（命令列）
+# ▶️ 使用方式
 
-編譯完成後，在命令列執行：
+## **方式一：指定輸入 + 指定輸出**
 
-```bash
+```
 FrontitudeToResxXlsx.exe <inputJsonPath> <outputXlsxPath>
 ```
 
 範例：
 
-```bash
-FrontitudeToResxXlsx.exe Frontitude_export.json output.xlsx
+```
+FrontitudeToResxXlsx.exe TestData/Frontitude_export.json Output/output.xlsx
 ```
 
-- `inputJsonPath`：Frontitude 匯出的 JSON 檔路徑。
-- `outputXlsxPath`：要輸出的 Excel 檔案路徑。
+---
 
-執行成功後，會產生一個可由 ResX Manager 匯入的 Excel 檔。
+## **方式二：只有輸入路徑 → 自動產生輸出檔名**
 
-## 專案結構
-
-簡化後的結構示意：
-
-```text
-FrontitudeResxConverter/
-├─ FrontitudeToResxXlsx/          # Console 專案
-│  ├─ Core/
-│  ├─ Properties/
-│  ├─ TestData/
-│  ├─ FrontitudeToResxXlsx.csproj
-│  └─ FrontitudeToResxXlsx.sln
-├─ .github/
-│  └─ workflows/
-│     └─ release.yml              # GitHub Actions：自動 Build + Release
-├─ README.md                      # 英文
-├─ README.zh-TW.md                # 繁體中文
-└─ README.ko.md                   # 韓文
+```
+FrontitudeToResxXlsx.exe TestData/Frontitude_export.json
 ```
 
-## 開發環境建議
+---
 
-1. 使用 Visual Studio 或 VS Code 開啟此專案。
-2. 透過 NuGet 安裝 `ClosedXML` 套件。
-3. 編譯後即可於命令列執行，指定 JSON 與輸出 xlsx 路徑。
+## **方式三：完全沒有輸入參數 → 等待使用者輸入**
 
-## GitHub Actions：自動 Build & Release
+程式會顯示：
 
-此專案包含一個 GitHub Actions workflow（`.github/workflows/release.yml`）：
+```
+No arguments provided.
+Please enter JSON input file path:
+```
 
-- 觸發條件：push **tag 名稱符合 `v*`**（例如 `v1.0.0`）。
-- 在 `windows-latest` 上執行：
-  - 還原 NuGet 套件。
-  - 使用 Release 設定建置 Console App。
-  - 針對 `win-x64` 做 `dotnet publish`，輸出單一 `.exe`。
-  - 產生 `.zip` 壓縮檔。
-  - 使用 `softprops/action-gh-release` 建立或更新 GitHub Release，並上傳：
-    - 單一 exe
-    - zip 包
+---
 
-### 使用流程
+## **方式四：拖曳執行（最方便）**
 
-1. 修改程式並 push 到 `main`。
-2. 建立 tag：
+1. 在檔案總管找到 JSON 檔  
+2. 拖曳到 `FrontitudeToResxXlsx.exe` 上  
+3. 程式自動使用該 JSON 執行  
 
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
+---
 
-3. GitHub Actions 會自動執行
-4. 完成後可在 **Releases** 頁面下載對應版本的檔案。
+# 🏗️ 開發說明
+
+- .NET 8  
+- ClosedXML 用於產生 xlsx  
+- 可在 VS / VS Code 執行  
+
+---
+
+# 🚀 GitHub Actions（自動化 Build / Release）
+
+- 推送 tag → 自動建置、產生 exe、建立 Release
