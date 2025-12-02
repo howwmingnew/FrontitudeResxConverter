@@ -14,7 +14,7 @@ This tool is designed for .NET / WPF applications that need to integrate Frontit
 
 ---
 
-## Features
+## 📌 Features
 
 - Converts Frontitude JSON to a ResX Manager–importable Excel file
 - Auto-generates translation columns and adjusts formatting
@@ -26,7 +26,7 @@ This tool is designed for .NET / WPF applications that need to integrate Frontit
 
 ---
 
-## Frontitude JSON Format
+## 📂 Frontitude JSON Format
 
 ```json
 {
@@ -45,7 +45,7 @@ This tool is designed for .NET / WPF applications that need to integrate Frontit
 
 ---
 
-## Excel Output Format (ResX Manager)
+## 📊 Excel Output Format (ResX Manager)
 
 Worksheet name: `ResXResourceManager`
 
@@ -59,7 +59,7 @@ Includes columns:
 
 ---
 
-# Usage
+# ▶️ Usage
 
 ### Method 1 — Specify input + output
 
@@ -85,7 +85,7 @@ Drag your JSON file onto the exe.
 
 ---
 
-## Development
+## 🏗️ Development
 
 - .NET 8  
 - Uses ClosedXML  
@@ -93,6 +93,6 @@ Drag your JSON file onto the exe.
 
 ---
 
-## GitHub Actions (Build & Release)
+## 🚀 GitHub Actions (Build & Release)
 
 - Tag push → auto build + auto release

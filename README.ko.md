@@ -14,7 +14,7 @@ FrontitudeResxConverter는 **Frontitude에서 내보낸 다국어 JSON**을
 
 ---
 
-## 기능
+## 📌 기능
 
 - Frontitude JSON → ResX Manager Excel 변환
 - 번역 컬럼 자동 생성 및 서식 조정
@@ -26,7 +26,7 @@ FrontitudeResxConverter는 **Frontitude에서 내보낸 다국어 JSON**을
 
 ---
 
-## Frontitude JSON 형식
+## 📂 Frontitude JSON 형식
 
 ```json
 {
@@ -45,7 +45,7 @@ FrontitudeResxConverter는 **Frontitude에서 내보낸 다국어 JSON**을
 
 ---
 
-## Excel 출력 형식 (ResX Manager)
+## 📊 Excel 출력 형식 (ResX Manager)
 
 워크시트 이름: `ResXResourceManager`
 
@@ -59,7 +59,7 @@ FrontitudeResxConverter는 **Frontitude에서 내보낸 다국어 JSON**을
 
 ---
 
-# 사용 방법
+# ▶️ 사용 방법
 
 ### 방법 1 — 입력 + 출력 직접 지정
 ```
@@ -81,7 +81,7 @@ JSON 파일을 exe 위에 드래그하면 자동 실행됩니다.
 
 ---
 
-## 개발 정보
+## 🏗️ 개발 정보
 
 - .NET 8  
 - ClosedXML 사용  
