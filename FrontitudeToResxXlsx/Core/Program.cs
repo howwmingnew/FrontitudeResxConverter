@@ -179,7 +179,27 @@ namespace FrontitudeToResxXlsx
 
                 // Save output file
                 wb.SaveAs(outputXlsxPath);
+
+                // Auto-open the generated file if save succeeded
+                try
+                {
+                    var fullPath = Path.GetFullPath(outputXlsxPath);
+                    if (File.Exists(fullPath))
+                    {
+                        Console.WriteLine("Opening output file...");
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = fullPath,
+                            UseShellExecute = true
+                        });
+                    }
+                }
+                catch (Exception openEx)
+                {
+                    Console.WriteLine($"File saved but could not be opened automatically: {openEx.Message}");
+                }
                 Console.WriteLine($"Done. Output: {outputXlsxPath}");
+
                 return 0;
             }
             catch (Exception ex)

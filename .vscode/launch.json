@@ -5,10 +5,10 @@
       "name": ".NET Launch (FrontitudeToResxXlsx)",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "prepareOutputFolder",
+      "preLaunchTask": "build-and-prepare-output",
       "program": "${workspaceFolder}/FrontitudeToResxXlsx/bin/Debug/net8.0/FrontitudeToResxXlsx.dll",
       "args": [
-        "TestData/Frontitude_export.json",
+        "TestData/Frontitude.json",
         "Output/output.xlsx"
       ],
       "cwd": "${workspaceFolder}/FrontitudeToResxXlsx",

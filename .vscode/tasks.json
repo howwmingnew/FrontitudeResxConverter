@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "build",
-      "type": "shell",
+      "type": "process",
       "command": "dotnet",
       "args": [
         "build",
@@ -13,7 +13,8 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "prepareOutputFolder",
+      "label": "build-and-prepare-output",
+      "dependsOn": ["build"],
       "type": "shell",
       "command": "powershell",
       "args": [
