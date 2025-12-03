@@ -30,6 +30,9 @@ namespace FrontitudeToResxXlsx
                     return 1;
                 }
 
+                // Remove surrounding quotes if present (from drag-and-drop)
+                userInput = userInput.Trim().Trim('"');
+
                 args = new string[] { userInput };
             }
 
